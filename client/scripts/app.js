@@ -3,7 +3,7 @@ $(document).ready(function(){
   $('#rooms').on('change', app.changeRoom);
 
   // Adding/switching friends.
-  $('#main').on('click', '.username', app.addFriend);
+  $('#main').on('click', '.user', app.addFriend);
   $('#friends').on('change', app.selectFriend);
 
   // Submitting messages.
@@ -21,21 +21,21 @@ var app = {
   //server: 'https://api.parse.com/1/classes/chatterbox'
   messages: [],
   friends: {},
-  username:'',
+  user:'',
   currentRoom:'lobby',
   currentFriend: '',
-  rooms: {'lobby': true},
+  rooms: {'lobby': true}
 };
 
 app.init = function(){
-  app.username = window.location.search.slice(10);
-  $('.user').text(app.username);
+  app.user = window.location.search.slice(10);
+  $('.user').text(app.user);
   for(var key in app.rooms){
     app.drawRoom(key);
   }
 
   this.fetch();
-  setInterval(app.refresh, 1000);
+  setInterval(app.refresh, 10000);
 };
 
 app.refresh = function(){
@@ -46,9 +46,9 @@ app.refresh = function(){
 app.redrawChat = function(){
   app.clearMessages();
   for(var i = 0; i < app.messages.length; i++){
-    if(app.messages[i].roomname === app.currentRoom){
+    // if(app.messages[i].roomname === app.currentRoom){
       app.drawMessage(app.messages[i]);
-    }
+    // }
   }
 };
 
@@ -81,9 +81,11 @@ app.fetch = function(time){
     // data: timeData,
     success: function (data) {
       console.log('Data recieved: ', data);
-      for (var d = data.results.length-1; d >= 0; d--) {
-        app.addMessage(data.results[d]);
-        app.addRoom(data.results[d].roomname);
+      data = JSON.parse(data);
+      for (var d = data.length-1; d >= 0; d--) {
+
+        app.addMessage(data[d]);
+        // app.addRoom(data[d].roomname);
       }
     },
     error: function (data) {
@@ -99,20 +101,21 @@ app.clearMessages = function(){
 
 // Add a message to our message variable, and prints if in current room.
 app.addMessage = function(message) {
+  //TODO: Get rid of local storage of messges.
   app.messages.push(message);
 
-  if(message.roomname === app.currentRoom) {
+  // if(message.roomname === app.currentRoom) {
     app.drawMessage(message);
-  }
+  // }
 };
 
 // Print a message to the screen.
 app.drawMessage = function(message){
   $('#chats').prepend($('<div/>', {'class': 'message'})
     .append($('<div/>', {'class': "metadata"})
-      .append($('<span/>', {'class': 'username'}).text(message.username))
+      .append($('<span/>', {'class': 'user'}).text(message.user))
       .append($('<span/>', {'class': 'room'}).text(message.roomname)))
-    .append($('<div/>', {'class': 'text'}).text(message.text))
+    .append($('<div/>', {'class': 'text'}).text(message.message_text))
     );
 };
 
@@ -131,9 +134,9 @@ app.handleSubmit = function(){
   // If message is there, sends it.
   if (text !== '') {
     var message = {
-      username:app.username,
-      text: text,
-      roomname: app.currentRoom
+      roomname: app.currentRoom,
+      user: app.user,
+      message_text: text
     };
     app.send(message);
     $('#input-text').val('');
@@ -162,7 +165,7 @@ app.changeRoom = function(){
   app.redrawChat();
 };
 
-// Adds a new friend when username clicked on.
+// Adds a new friend when user clicked on.
 app.addFriend = function(){
   var name = $(this).text();
   if (app.friends[name] !== name) {
@@ -182,7 +185,7 @@ app.selectFriend = function(){
 // Highlights currently selected friend.
 app.highlight = function() {
   $('#friends').val(app.currentFriend);
-  $('.username').each(function(index, value) {
+  $('.user').each(function(index, value) {
     $(value).removeClass('highlight');
     if (app.currentFriend === $(value).text()) {
       $(value).addClass('highlight');
