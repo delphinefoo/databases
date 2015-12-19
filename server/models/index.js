@@ -5,7 +5,7 @@ var db = require('../db');
 
 module.exports = {
   messages: {
-    get: function (msg, callback) {
+    get: function (callback) {
       db.connection.query('SELECT * FROM messages', function(err, result){
         if (err) {
           console.log('error', err)
@@ -28,7 +28,16 @@ module.exports = {
 
   users: {
     // Ditto as above.
-    get: function () {},
+    get: function (callback) {
+      db.connection.query('SELECT * FROM users', function(err, result){
+        if (err) {
+          console.log('error', err)
+        } else {
+          // console.log('Results', result);
+         callback(result);
+        }
+      });
+    },
     post: function (username) {
       db.connection.query('INSERT INTO users (`username`) values ("'+username+'")');
     }

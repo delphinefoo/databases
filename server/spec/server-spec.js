@@ -68,10 +68,6 @@ describe("Persistent Node Chat Server", function() {
     // TODO - The exact query string and query args to use
     // here depend on the schema you design, so I'll leave
     // them up to you. */
-    request({ method: "POST",
-              uri: "http://127.0.0.1:3000/classes/users",
-              json: { username: "Valjean" }
-    }, function () {
       // Post a message to the node chat server:
       request({ method: "POST",
                 uri: "http://127.0.0.1:3000/classes/messages",
@@ -93,9 +89,57 @@ describe("Persistent Node Chat Server", function() {
                 // console.log('messageLog', messageLog);
                 expect(messageLog[0].message_text).to.equal("Men like you can never change!");
                 expect(messageLog[0].roomname).to.equal("main");
-                done();
+                // done();
           });
         });
+      });
+    request({ method: "POST",
+                uri: "http://127.0.0.1:3000/classes/users",
+                json: { username: "Fantine" }
+      }, function () {
+        // Post a message to the node chat server:
+        request({ method: "POST",
+                  uri: "http://127.0.0.1:3000/classes/messages",
+                  json: {
+                    roomname: "main",
+                    user: "Fantine",
+                    message_text: "Come on Captain, you can wear your shoes!"
+                  }
+        }, function (){
+          var queryString = "SELECT * FROM `messages`";
+          var queryArgs = [];
+
+          dbConnection.query(queryString, queryArgs, function(err) {
+            if (err) { throw err; }
+
+            request("http://127.0.0.1:3000/classes/messages", function(error, response, body) {
+                  // console.log('response: ', response);
+                  var messageLog = JSON.parse(body);
+                  // console.log('messageLog', messageLog);
+                  expect(messageLog[1].message_text).to.equal("Come on Captain, you can wear your shoes!");
+                  expect(messageLog[1].roomname).to.equal("main");
+                  done();
+          });
+        });
+      });
+    });
+  });
+
+  it("Should output all users from the DB", function(done) {
+    var queryString = "SELECT * FROM `users`";
+    var queryArgs = [];
+    dbConnection.query(queryString, queryArgs, function(err) {
+      if (err) { throw err; }
+
+      request("http://127.0.0.1:3000/classes/users", function(error, response, body) {
+        // console.log('response: ', response);
+        console.log('body', body);
+        var userLog = JSON.parse(body);
+        console.log('userLog: ',userLog);
+        // console.log('messageLog', messageLog);
+        expect(userLog[0].username).to.equal("Valjean");
+        expect(userLog[1].username).to.equal("Fantine");
+        done();
       });
     });
   });
