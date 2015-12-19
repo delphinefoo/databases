@@ -5,17 +5,21 @@ var db = require('../db');
 
 module.exports = {
   messages: {
-    get: function (roomname) {
-      //call some function from database (which will have a query in it)
-      db.messages.get(roomname);
+    get: function (msg, callback) {
+      db.connection.query('SELECT * FROM messages', function(err, result){
+        if (err) {
+          console.log('error', err)
+        } else {
+          // console.log('Results', result);
+         callback(result);
+        }
+      });
     }, // a function which produces all the messages
     post: function (msg) {
-      console.log(msg);
       db.connection.query('INSERT INTO messages SET ?', msg, function(err, result){
         if (err) {
           console.log('error', err)
         } else {
-          console.log(result);
           return result;
         }
       });
@@ -26,7 +30,6 @@ module.exports = {
     // Ditto as above.
     get: function () {},
     post: function (username) {
-      console.log(username);
       db.connection.query('INSERT INTO users (`username`) values ("'+username+'")');
     }
   }
