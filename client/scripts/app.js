@@ -46,9 +46,9 @@ app.refresh = function(){
 app.redrawChat = function(){
   app.clearMessages();
   for(var i = 0; i < app.messages.length; i++){
-    // if(app.messages[i].roomname === app.currentRoom){
+    if(app.messages[i].roomname === app.currentRoom){
       app.drawMessage(app.messages[i]);
-    // }
+    }
   }
 };
 
@@ -82,10 +82,11 @@ app.fetch = function(time){
     success: function (data) {
       console.log('Data recieved: ', data);
       data = JSON.parse(data);
+      app.clearMessages();
       for (var d = data.length-1; d >= 0; d--) {
 
         app.addMessage(data[d]);
-        // app.addRoom(data[d].roomname);
+        app.addRoom(data[d].roomname);
       }
     },
     error: function (data) {
@@ -104,9 +105,9 @@ app.addMessage = function(message) {
   //TODO: Get rid of local storage of messges.
   app.messages.push(message);
 
-  // if(message.roomname === app.currentRoom) {
+  if(message.roomname === app.currentRoom) {
     app.drawMessage(message);
-  // }
+  }
 };
 
 // Print a message to the screen.
