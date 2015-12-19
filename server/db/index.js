@@ -9,28 +9,3 @@ exports.connection=mysql.createConnection({
   database:"chat"
 });
 
-//request method
-//uri pathname: ends in messages, users
-  //query string
-    //SELECT message_text, username, maybe created_at
-    //WHERE roomname if roomname provided
-    //FROM messages
-
-module.exports={
-  messages: {
-    get: function(roomname){
-      roomname = '= "'+roomname+'"' || 'LIKE "%"'
-      exports.connection.query('SELECT `message_text` `username`
-                                FROM `messages`
-                                WHERE `roomname` '+roomname);
-      // SELECT message_text, username
-        //where roomname if provided
-
-      //FROM tablename
-    },
-    post: function(){
-
-    }
-  },
-
-}

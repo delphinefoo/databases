@@ -37,9 +37,9 @@ describe("Persistent Node Chat Server", function() {
       request({ method: "POST",
               uri: "http://127.0.0.1:3000/classes/messages",
               json: {
-                username: "Valjean",
-                message: "In mercy's name, three days is all I need.",
-                roomname: "Hello"
+                roomname: "Hello",
+                user: "Valjean",
+                message_text: "In mercy's name, three days is all I need."
               }
       }, function () {
         // Now if we look in the database, we should find the
@@ -55,7 +55,7 @@ describe("Persistent Node Chat Server", function() {
           expect(results.length).to.equal(1);
 
           // TODO: If you don't have a column named text, change this test.
-          expect(results[0].text).to.equal("In mercy's name, three days is all I need.");
+          expect(results[0].message_text).to.equal("In mercy's name, three days is all I need.");
 
           done();
         });
